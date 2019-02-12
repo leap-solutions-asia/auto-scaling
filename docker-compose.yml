@@ -1,0 +1,21 @@
+version: '3'
+
+networks:
+  default:
+    driver: bridge
+
+volumes:
+  data:
+    driver: local
+
+services:
+  controller:
+    build: .
+    image: leapsolutionsasia/auto-scaling
+    hostname: controller
+    networks:
+      - default
+    restart: always
+    volumes:
+      - data:/auto-scaling
+    command: python -u controller/controller.py
