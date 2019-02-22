@@ -3,8 +3,7 @@
 import sys
 import json
 import threading
-from argparse import ArgumentParser
-if sys.version_info.major >= 3:
+if sys.version_info[0] >= 3:
     from http.server import BaseHTTPRequestHandler, HTTPServer
 else:
     from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
@@ -41,7 +40,7 @@ class AutoScalingUsageHandler(BaseHTTPRequestHandler):
         response = json.dumps({
             "usage": round(collector.usage, 1),
         })
-        if sys.version_info.major >= 3:
+        if sys.version_info[0] >= 3:
             response = response.encode('utf8')
         self.send_response(200)
         self.send_header('Content-Type', 'application/json; charset=utf-8')
@@ -52,13 +51,20 @@ class AutoScalingUsageHandler(BaseHTTPRequestHandler):
 
 if __name__ == "__main__":
     # Options
-    parser = ArgumentParser()
-    parser.add_argument("-p", "--port", type=int, default=PORT, help="Port Number")
-    args = parser.parse_args()
+    try:
+        from argparse import ArgumentParser
+        parser = ArgumentParser()
+        parser.add_argument("-p", "--port", type=int, default=PORT, help="Port Number")
+        options = parser.parse_args()
+    except:
+        from optparse import OptionParser
+        parser = OptionParser()
+        parser.add_option("-p", "--port", type="int", default=PORT, help="Port Number")
+        (options, args) = parser.parse_args()
 
     try:
         collector = Collector()
         collector.start()
-        HTTPServer(('', args.port), AutoScalingUsageHandler).serve_forever()
+        HTTPServer(('', options.port), AutoScalingUsageHandler).serve_forever()
     except KeyboardInterrupt:
         collector.event.set()
