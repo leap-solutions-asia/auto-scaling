@@ -6,8 +6,8 @@ Just testing!
 
 ### Specifications
 
-* Supported OS (Leap GIO Public Virtual Machine)
-  - CentOS 7.x
+Supported OS (Leap GIO Public Virtual Machine)
+* CentOS 7.x
 
 ### Requirements
 
@@ -31,17 +31,18 @@ bash <(curl -Ls https://github.com/leap-solutions-asia/auto-scaling/raw/master/s
 
 ### Specifications
 
-* Supported OS (Leap GIO Public Virtual Machine)
-  - CentOS 6.x
-  - CentOS 7.x
-  - Ubuntu 14.04
-  - Ubuntu 16.04
-* Agent port
-  - 8585/tcp (allow 8585/tcp iptables, firewalld and ufw)
+Supported OS (Leap GIO Public Virtual Machine)
+* CentOS 6.x
+* CentOS 7.x
+* Ubuntu 14.04
+* Ubuntu 16.04
+
+Agent port
+* 8585/tcp (allow 8585/tcp iptables, firewalld and ufw)
 
 ### Requirements
 
-*python >= 2.6
+* python >= 2.6
 
 Required for Installation
 * git
@@ -55,7 +56,7 @@ Required for Installation
 ```
 bash <(curl -Ls https://github.com/leap-solutions-asia/auto-scaling/raw/master/setup/setup-agent.sh)
 ```
-1. Stop the VM and create a new OS Template
+4. Stop the VM and create a new OS Template
 
 ## For Developer
 
@@ -68,9 +69,6 @@ bash <(curl -Ls https://github.com/leap-solutions-asia/auto-scaling/raw/master/s
 ### Getting Started
 
 1. Clone repository
-```
-$ git clone git@github.com:leap-solutions-asia/auto-scaling.git
-```
 1. Start Auto Scaling Container
 ```
 $ cd auto-scaling
