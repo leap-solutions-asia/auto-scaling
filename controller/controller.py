@@ -231,7 +231,7 @@ class AutoScalingUsageCollector(threading.Thread):
             usage = None
             try:
                 result = requests.get(self._endpoint, timeout=self._TIMEOUT)
-                usage = result.json()['usage']
+                usage = round(result.json()['usage'], 1)
                 self._info['active'] = True
                 self._info['failcount'] = 0
             except:
