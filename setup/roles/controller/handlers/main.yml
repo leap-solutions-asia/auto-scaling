@@ -1,0 +1,8 @@
+---
+
+- name: restart default auto scaling controller
+  shell: /usr/local/bin/docker-compose -f {{ install_prefix }}0/docker-compose.yml up -d --no-build
+
+- name: restart spare auto scaling controller
+  shell: /usr/local/bin/docker-compose -f {{ install_prefix }}{{ item }}/docker-compose.yml up -d --no-build
+  with_items: "{{ spare_controllers }}"

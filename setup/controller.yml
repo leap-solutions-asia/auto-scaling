@@ -1,0 +1,6 @@
+- hosts: all
+  roles:
+    - upgrade
+    - docker
+    - docker-compose
+    - controller

@@ -1,0 +1,72 @@
+#! /bin/bash
+#
+### BEGIN INIT INFO
+# Provides: Auto Scaling Agent for Leap GIO Public
+# Required-Start: $remote_fs
+# Default-Start: 2 3 4 5
+# Default-Stop: 0 1 6
+# Short-Description: Auto Scaling Agent for Leap GIO Public
+# Description: Auto Scaling Agent for Leap GIO Public
+### END INIT INFO
+
+# source function library
+. /lib/lsb/init-functions
+
+#
+RETVAL=0
+prog="auto-scaling-agent"
+PROG_FULL=/opt/auto-scaling/agent/agent.py
+PID_FILE=/var/run/${prog}.pid
+
+#
+pgrep -f ${PROG_FULL} > /dev/null
+running=$?
+
+#
+start(){
+    log_daemon_msg "Starting ${prog}"
+    python ${PROG_FULL} > /dev/null 2>&1 &
+    pid=$!
+    sleep 1
+    pgrep -f ${PROG_FULL} > /dev/null
+    RETVAL=$?
+    if [ "${RETVAL}" -eq 0 ]; then
+        echo ${pid} > ${PID_FILE}
+    fi
+    return ${RETVAL}
+}
+
+#
+stop(){
+    log_daemon_msg "Stopping ${prog}"
+    pkill -f ${PROG_FULL} > /dev/null
+    RETVAL=$?
+    [ "${RETVAL}" -eq 0 ] && rm -f ${PID_FILE}
+    echo
+    return ${RETVAL}
+}
+
+#
+case "$1" in
+    start)
+        [ "${running}" -eq 0 ] && exit 0
+        start
+        ;;
+    stop)
+        [ "${running}" -eq 0 ] || exit 0
+        stop
+        ;;
+    restart)
+        [ "${running}" -eq 0 ] && stop && sleep 1
+        start
+        ;;
+    status)
+        status_of_proc -p ${PID_FILE} ${PROG_FULL} ${prog}
+        ;;
+    *)
+        echo $(basename $0)" {start|stop|restart}"
+        exit 1
+        ;;
+esac
+
+exit 0

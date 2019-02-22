@@ -1,0 +1,27 @@
+---
+
+- name: systemd restart auto-scaling-agent.service
+  systemd:
+    name: auto-scaling-agent.service
+    state: restarted
+    enabled: yes
+  listen: restart auto-scaling-agent
+  when: "( ansible_os_family == 'RedHat' and ansible_distribution_major_version|int > 6 ) or ( ansible_distribution == 'Ubuntu' and ansible_distribution_major_version|int > 14 )"
+
+- name: service restart auto-scaling-agent
+  service:
+    name: auto-scaling-agent
+    state: restarted
+    enabled: yes
+  listen: restart auto-scaling-agent
+  when: "( ansible_os_family == 'RedHat' and ansible_distribution_major_version|int == 6 ) or ( ansible_distribution == 'Ubuntu' and ansible_distribution_major_version|int == 14 )"
+
+- name: /etc/init.d/iptables save
+  shell: /etc/init.d/iptables save
+  listen: save iptables
+  when: check_etc_iptables.stat.exists
+
+- name: /usr/libexec/iptables/iptables.init save
+  shell: /usr/libexec/iptables/iptables.init save
+  listen: save iptables
+  when: check_usr_iptables.stat.exists

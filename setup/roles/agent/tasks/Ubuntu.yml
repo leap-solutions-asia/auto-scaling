@@ -1,0 +1,10 @@
+---
+
+- name: include tasks agent.yml
+  include_tasks: agent.yml
+
+- name: include tasks systemd.yml
+  include_tasks: systemd.yml
+
+- name: include tasks ufw.yml
+  include_tasks: ufw.yml

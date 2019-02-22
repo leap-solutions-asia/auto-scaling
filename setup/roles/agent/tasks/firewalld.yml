@@ -1,0 +1,8 @@
+---
+
+- name: set 8585/tcp to firewalld
+  firewalld: >
+    port=8585/tcp
+    permanent=true
+    state=enabled
+    immediate=true

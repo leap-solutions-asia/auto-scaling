@@ -1,0 +1,20 @@
+---
+
+- name: check /etc/init.d/iptables
+  stat:
+    path: /etc/init.d/iptables
+  register: check_etc_iptables
+
+- name: check /usr/libexec/iptables/iptables.init
+  stat:
+    path: /usr/libexec/iptables/iptables.init
+  register: check_usr_iptables
+
+- name: set 8585/tcp to iptables
+  iptables:
+    chain: INPUT
+    action: insert
+    protocol: tcp
+    destination_port: 8585
+    jump: ACCEPT
+  notify: save iptables

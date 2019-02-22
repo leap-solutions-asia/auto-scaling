@@ -102,3 +102,7 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+
+# Environments for Auto Scaling
+cloudstack.ini
+autoscaling.status
