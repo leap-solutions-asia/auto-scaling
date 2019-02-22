@@ -1,0 +1,16 @@
+---
+
+- name: mkdir /opt/auto-scaling/agent
+  file: >
+    path=/opt/auto-scaling/agent
+    state=directory
+    owner=root
+    group=root
+    mode=0755
+
+- name: install agent.py
+  copy: >
+    src=agent.py
+    dest=/opt/auto-scaling/agent/agent.py
+    mode=0755
+  notify: restart auto-scaling-agent

@@ -1,0 +1,10 @@
+---
+
+- name: include tasks agent.yml
+  include_tasks: agent.yml
+
+- name: include tasks service.yml
+  include_tasks: service.yml
+
+- name: include tasks ufw.yml
+  include_tasks: ufw.yml

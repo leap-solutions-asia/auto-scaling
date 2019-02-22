@@ -1,0 +1,21 @@
+---
+
+- name: install auto-scaling-agent.rc
+  copy: >
+    src={{ agent_item }}
+    dest=/etc/init.d/auto-scaling-agent
+    mode=0755
+  loop_control:
+    loop_var: agent_item
+  with_first_found:
+    - files:
+      - 'auto-scaling-agent.init.{{ ansible_os_family }}-{{ ansible_distribution }}-{{ ansible_distribution_major_version }}'
+      - 'auto-scaling-agent.init.{{ ansible_os_family }}-{{ ansible_distribution }}'
+      - 'auto-scaling-agent.init.{{ ansible_os_family }}-{{ ansible_distribution_major_version }}'
+      - 'auto-scaling-agent.init.{{ ansible_os_family }}'
+      - 'auto-scaling-agent.init.{{ ansible_distribution }}-{{ ansible_distribution_major_version }}'
+      - 'auto-scaling-agent.init.{{ ansible_distribution }}'
+      skip: false
+      paths:
+      - ../files/
+  notify: service restart auto-scaling-agent

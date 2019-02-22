@@ -1,0 +1,50 @@
+---
+
+- name: mkdir /opt/auto-scaling
+  file: >
+    path={{ install_prefix }}{{ item }}
+    state=directory
+    owner=root
+    group=root
+    mode=0755
+  with_sequence: >
+    start=0
+    count={{ spare_count + 1 }}
+
+- name: copy docker-compose.yml to default auto scaling
+  template: >
+    src=docker-compose.yml.j2
+    dest={{install_prefix }}0/docker-compose.yml
+    owner=root
+    group=root
+    mode=0644
+  notify: restart default auto scaling controller
+
+- name: copy docker-compose.yml to spare auto scaling
+  template: >
+    src=docker-compose.yml.j2
+    dest={{ install_prefix }}{{ item }}/docker-compose.yml
+    owner=root
+    group=root
+    mode=0644
+  register: copy_spare_controllers
+  with_sequence: >
+    start=1
+    count={{ spare_count }}
+  notify: restart spare auto scaling controller
+
+- name: check spare auto scaling controllers
+  shell: /usr/local/bin/docker-compose -f {{ install_prefix }}{{ item }}/docker-compose.yml ps -q
+  changed_when: False
+  register: changed_spare_controllers
+  with_items: "{{ copy_spare_controllers.results | selectattr('changed', 'sameas', true) | map(attribute='item') | list }}"
+
+- name: init spare_controllers
+  set_fact:
+    spare_controllers: []
+
+- name: set spare_controllers
+  set_fact:
+    spare_controllers: "{{ spare_controllers + [item.item] }}"
+  when: item.stdout_lines|length > 0
+  with_items: "{{ changed_spare_controllers.results }}"

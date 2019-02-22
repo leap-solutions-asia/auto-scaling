@@ -1,0 +1,8 @@
+---
+
+- name: install auto-scaling-agent.service
+  copy: >
+    src=auto-scaling-agent.service
+    dest=/etc/systemd/system/auto-scaling-agent.service
+    mode=0755
+  notify: systemd restart auto-scaling-agent.service

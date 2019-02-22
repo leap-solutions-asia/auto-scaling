@@ -1,0 +1,2 @@
+install_prefix: /opt/auto-scaling/auto-scaling
+spare_count: 4

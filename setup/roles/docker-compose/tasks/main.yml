@@ -1,0 +1,13 @@
+---
+
+- name: install docker-compose
+  get_url: >
+    url={{ url }}
+    dest=/usr/local/bin/docker-compose
+    sha256sum={{ checksum }}
+    force=True
+
+- name: chmod +x docker-compose
+  file: >
+    dest=/usr/local/bin/docker-compose
+    mode=a+x
