@@ -18,4 +18,16 @@ services:
     volumes:
       - data:/auto-scaling
       - .:/auto-scaling/tmp
-    command: python -u controller/controller.py
+    command: python -u controller/controller.py --prefix {{ vm_prefix }}{{ item }}
+  dashboard:
+    image: leapsolutionsasia/auto-scaling
+    hostname: dashboard
+    networks:
+      - default
+    ports:
+      - {{ dashboard_port }}:{{ dashboard_port + item|int }}
+    restart: always
+    volumes:
+      - data:/auto-scaling
+      - .:/auto-scaling/tmp
+    command: python -u dashboard/dashboard.py

@@ -1,50 +1,28 @@
 ---
 
-- name: mkdir /opt/auto-scaling
-  file: >
-    path={{ install_prefix }}{{ item }}
-    state=directory
-    owner=root
-    group=root
-    mode=0755
-  with_sequence: >
-    start=0
-    count={{ spare_count + 1 }}
+- name: include tasks controller.yml
+  include_tasks: controller.yml
 
-- name: copy docker-compose.yml to default auto scaling
-  template: >
-    src=docker-compose.yml.j2
-    dest={{install_prefix }}0/docker-compose.yml
-    owner=root
-    group=root
-    mode=0644
-  notify: restart default auto scaling controller
-
-- name: copy docker-compose.yml to spare auto scaling
-  template: >
-    src=docker-compose.yml.j2
-    dest={{ install_prefix }}{{ item }}/docker-compose.yml
-    owner=root
-    group=root
-    mode=0644
-  register: copy_spare_controllers
-  with_sequence: >
-    start=1
-    count={{ spare_count }}
-  notify: restart spare auto scaling controller
-
-- name: check spare auto scaling controllers
-  shell: /usr/local/bin/docker-compose -f {{ install_prefix }}{{ item }}/docker-compose.yml ps -q
+- name: systemctl status firewalld
+  shell: systemctl status firewalld
+  args:
+    warn: False
+  register: firewalld_status
   changed_when: False
-  register: changed_spare_controllers
-  with_items: "{{ copy_spare_controllers.results | selectattr('changed', 'sameas', true) | map(attribute='item') | list }}"
+  failed_when: firewalld_status.rc not in [ 0, 3, 4 ]
 
-- name: init spare_controllers
-  set_fact:
-    spare_controllers: []
+- name: include tasks firewalld.yml
+  include_tasks: firewalld.yml
+  when: firewalld_status.rc == 0
 
-- name: set spare_controllers
-  set_fact:
-    spare_controllers: "{{ spare_controllers + [item.item] }}"
-  when: item.stdout_lines|length > 0
-  with_items: "{{ changed_spare_controllers.results }}"
+- name: systemctl status iptables
+  shell: systemctl status iptables
+  args:
+    warn: False
+  register: iptables_status
+  changed_when: False
+  failed_when: iptables_status.rc not in [ 0, 3, 4 ]
+
+- name: include tasks iptables.yml
+  include_tasks: iptables.yml
+  when: iptables_status.rc == 0

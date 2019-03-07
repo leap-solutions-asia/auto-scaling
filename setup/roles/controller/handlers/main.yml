@@ -6,3 +6,13 @@
 - name: restart spare auto scaling controller
   shell: /usr/local/bin/docker-compose -f {{ install_prefix }}{{ item }}/docker-compose.yml up -d --no-build
   with_items: "{{ spare_controllers }}"
+
+- name: /etc/init.d/iptables save
+  shell: /etc/init.d/iptables save
+  listen: save iptables
+  when: check_etc_iptables.stat.exists
+
+- name: /usr/libexec/iptables/iptables.init save
+  shell: /usr/libexec/iptables/iptables.init save
+  listen: save iptables
+  when: check_usr_iptables.stat.exists
