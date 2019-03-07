@@ -19,3 +19,14 @@ services:
     volumes:
       - data:/auto-scaling
     command: python -u controller/controller.py
+  dashboard:
+    image: leapsolutionsasia/auto-scaling
+    hostname: dashboard
+    networks:
+      - default
+    ports:
+      - 8080:8080
+    restart: always
+    volumes:
+      - data:/auto-scaling
+    command: python -u dashboard/dashboard.py

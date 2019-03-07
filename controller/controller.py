@@ -457,9 +457,10 @@ class AutoScalingStatus(AutoScalingData):
 
 #
 class AutoScalingController:
-    def __init__(self, config_file, status_file, debug=False):
+    def __init__(self, config_file, status_file, prefix=VM_PREFIX, debug=False):
         self._debug = debug
         self._client = None
+        self._prefix = prefix
         self._config = AutoScalingConfig(config_file, self._debug)
         self._status = AutoScalingStatus(status_file, self._debug)
 
@@ -523,7 +524,7 @@ class AutoScalingController:
         if self._config.data['autoscaling']['autoscaling_vm'] <= len(vms):
             return
         for i in range(1, 100):
-            name = "{}{:02d}".format(VM_PREFIX, i)
+            name = "{}{:02d}".format(self._prefix, i)
             if name not in vms:
                 break
         vm = self._client.create_vm(
@@ -617,6 +618,7 @@ if __name__ == '__main__':
     parser.add_argument("-d", "--debug", action="store_true", default=False, help="Debug mode")
     parser.add_argument("-c", "--config", type=str, default=CONFIG_FILE, help="Config file")
     parser.add_argument("-s", "--status", type=str, default=STATUS_FILE, help="Status file")
+    parser.add_argument("-P", "--prefix", type=str, default=VM_PREFIX, help="VM prefix. Default: {}".format(VM_PREFIX))
     args = parser.parse_args()
 
     #
@@ -624,7 +626,7 @@ if __name__ == '__main__':
 
     try:
         # Run AutoScalingController
-        controller = AutoScalingController(args.config, args.status, args.debug)
+        controller = AutoScalingController(args.config, args.status, args.prefix, args.debug)
         controller.run()
     except KeyboardInterrupt:
         del controller

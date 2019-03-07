@@ -1,0 +1,11 @@
+---
+
+- name: set dashboard ports to firewalld
+  firewalld: >
+    port={{ dashboard_port + item|int }}/tcp
+    permanent=true
+    state=enabled
+    immediate=true
+  with_sequence: >
+    start=0
+    count={{ spare_count + 1 }}

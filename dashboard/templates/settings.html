@@ -1,0 +1,56 @@
+{% extends "layout.html" %}
+{% block content %}
+
+    <div class="content-section">
+
+        <form method="POST" action="">
+        {{ form.hidden_tag() }}
+		
+        <div class="col-md-8">
+          <div class="content-section">
+            <h3>Autoscale Settings</h3>
+            <p>
+              <ul class="list-group">
+                <li class="list-group-item list-group-item-light">Scaling VM No. :{{ autoscaling_autoscaling_vm }}</li>
+                <li class="list-group-item list-group-item-light">Upper Limit : {{ autoscaling_upper_limit }}</li>
+                <li class="list-group-item list-group-item-light">Lower Limit : {{ autoscaling_lower_limit }}</li>
+              </ul>
+            </p>
+          </div>
+        </div>
+        
+        <div class="col-md-8">
+          <div class="content-section">
+            <h3>Tenant Settings</h3>
+            <p>
+              <ul class="list-group">
+                <li class="list-group-item list-group-item-light">Zone : {{ tenant_zone_name }}</li>
+                <li class="list-group-item list-group-item-light">Load Balancer Rule : {{ tenant_lb_rule_name }}</li>
+                <li class="list-group-item list-group-item-light">Template : {{ tenant_template_name }}</li>
+                <li class="list-group-item list-group-item-light">Service Offering : {{ tenant_serviceoffering_name }}</li>
+              </ul>
+            </p>
+          </div>
+        </div>
+        
+        <div class="col-md-8">
+          <div class="content-section">
+            <h3>VM list</h3>
+            <p>
+              <ul class="list-group">
+                {% for i in vms_name_list %}
+                    <li class="list-group-item list-group-item-light">{{ i }}</li>
+                {% endfor %}
+              </ul>
+            </p>
+          </div>
+        </div>
+
+        <div class="form-group">
+            {{ form.submit(class="btn btn-outline-info") }}
+        </div>	
+
+        </form>
+    </div>
+
+{% endblock content %}

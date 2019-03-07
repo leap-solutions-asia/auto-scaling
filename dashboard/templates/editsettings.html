@@ -1,0 +1,135 @@
+{% extends "layout.html" %}
+{% block content %}
+
+    <div class="content-section">
+
+        <form method="POST" action="">
+            {{ form.hidden_tag() }}
+
+            <fieldset class="form-group">
+
+                <legend class="border-bottom mb-4">Autoscale Settings Here!</legend>
+
+                <div class="form-group">
+                    {{ form.autoscaling_vm.label(class="form-control-label") }}
+                    {% if form.autoscaling_vm.errors %}
+                        {{ form.autoscaling_vm(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.autoscaling_vm.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.autoscaling_vm(class="form-control form-control-lg", value=autoscaling_autoscaling_vm) }}
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    {{ form.upper_limit.label(class="form-control-label") }}
+                    {% if form.upper_limit.errors %}
+                        {{ form.upper_limit(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.upper_limit.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.upper_limit(class="form-control form-control-lg", value=autoscaling_upper_limit) }}
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    {{ form.lower_limit.label(class="form-control-label") }}
+                    {% if form.lower_limit.errors %}
+                        {{ form.lower_limit(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.lower_limit.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.lower_limit(class="form-control form-control-lg", value=autoscaling_lower_limit) }}
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    {{ form.zone_uuid.label(class="form-control-label") }}
+                    {% if form.zone_uuid.errors %}
+                        {{ form.zone_uuid(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.zone_uuid.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.zone_uuid(class="form-control form-control-lg", value=tenant_zone_uuid) }}
+                    {% endif %}
+                </div>
+				
+                <div class="form-group">
+                    {{ form.lb_rule_uuid.label(class="form-control-label") }}
+                    {% if form.lb_rule_uuid.errors %}
+                        {{ form.lb_rule_uuid(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.lb_rule_uuid.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.lb_rule_uuid(class="form-control form-control-lg", value=tenant_lb_rule_uuid) }}
+                    {% endif %}
+                </div>
+				
+                <div class="form-group">
+                    {{ form.template_uuid.label(class="form-control-label") }}
+                    {% if form.template_uuid.errors %}
+                        {{ form.template_uuid(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.template_uuid.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.template_uuid(class="form-control form-control-lg", default=tenant_template_uuid) }}
+                    {% endif %}
+                </div>
+				
+                <div class="form-group">
+                    {{ form.serviceoffering_uuid.label(class="form-control-label") }}
+                    {% if form.serviceoffering_uuid.errors %}
+                        {{ form.serviceoffering_uuid(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.serviceoffering_uuid.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.serviceoffering_uuid(class="form-control form-control-lg", value=tenant_serviceoffering_uuid) }}
+                    {% endif %}
+                </div>
+				
+                <div class="form-group">
+                    {{ form.vms.label(class="form-control-label") }}
+                    {% if form.vms.errors %}
+                        {{ form.vms(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.vms.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.vms(class="form-control form-control-lg", value=vms)  }}
+                    {% endif %}
+                </div>
+
+            </fieldset>
+
+            <div class="form-group">
+                {{ form.submit(class="btn btn-outline-info") }}
+            </div>
+
+        </form>
+
+    </div>
+
+{% endblock content %}

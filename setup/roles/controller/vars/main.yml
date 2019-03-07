@@ -1,2 +1,4 @@
 install_prefix: /opt/auto-scaling/auto-scaling
+vm_prefix: asvm
+dashboard_port: 8080
 spare_count: 4
