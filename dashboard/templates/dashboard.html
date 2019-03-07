@@ -1,0 +1,58 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<meta charset="utf-8">    
+<script src="static/Chart.min.js"></script>
+<body>
+
+{% if message %}
+    <h1>{{ message }}</h1>
+{% endif %}
+
+<!-- bar chart canvas element --><canvas id="ChartDemo"></canvas>
+<script>
+
+var ctx = document.getElementById("ChartDemo").getContext('2d');
+var myChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+        labels : {{ labels|tojson }},
+        datasets: {{ datasets|tojson }},
+    },
+    options: {
+        responsive: true,
+        scales: {
+            yAxes: [
+                { ticks: { beginAtZero: true, min: 0, max: 100 } }
+            ]
+        }
+    }
+});
+
+</script>
+
+<p></p>
+
+<table id="customers">
+<thead><tr><th>Name</th><th>Type</th><th>Active</th><th>No. of Failure</th></tr></thead>
+{% for uuid, value in autoscaling_data['vm'].items() %}
+<tr>
+    <td>{{ value['name'] }}</td>
+    {% if value['autoscaling'] %}
+        <td>Autoscaling VM</td>
+    {% else %}
+        <td>Stable VM</td>
+    {% endif %}
+    {% if value['active'] %}
+        <td>Active</td>
+    {% else %}
+        <td>Inactive</td>
+    {% endif %}
+    <td>{{ value['failcount'] }}</td>
+</tr>
+{% endfor %}
+</table>
+<p></p>
+
+
+{% endblock content %}
