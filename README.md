@@ -29,8 +29,7 @@ Required for Installation
 ```
 bash <(curl -Ls https://github.com/leap-solutions-asia/auto-scaling/raw/master/setup/setup.sh)
 ```
-4. Access to dashboard
-  - http://<VM IP Address>:8080/
+4. Access to dashboard http://VM_IP_ADDRESS:8080/
 
 ## Auto Scaling Agent
 
@@ -79,5 +78,4 @@ bash <(curl -Ls https://github.com/leap-solutions-asia/auto-scaling/raw/master/s
 $ cd auto-scaling
 $ docker-compose up -d
 ```
-3. Access to dashboard
-  - http://localhost:8080/
+3. Access to dashboard http://localhost:8080/
