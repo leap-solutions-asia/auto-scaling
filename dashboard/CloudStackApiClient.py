@@ -42,7 +42,7 @@ class CloudStackApiClient:
 
     def listTemplates(self, force=False):
         if force or len(self.tps) == 0:
-            tps = self._cs.listTemplates()
+            tps = self._cs.listTemplates(templatefilter="self")
             self.tps = [ (tp['id'], tp['name']) for tp in tps['template'] ]
         return self.tps
 		
