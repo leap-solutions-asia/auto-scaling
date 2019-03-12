@@ -6,20 +6,20 @@
         <form method="POST" action="">
         {{ form.hidden_tag() }}
 		
-        <div class="col-md-8">
+        <div class="col-md-20">
           <div class="content-section">
             <h3>Autoscale Settings</h3>
             <p>
               <ul class="list-group">
-                <li class="list-group-item list-group-item-light">Scaling VM No. :{{ autoscaling_autoscaling_vm }}</li>
-                <li class="list-group-item list-group-item-light">Upper Limit : {{ autoscaling_upper_limit }}</li>
-                <li class="list-group-item list-group-item-light">Lower Limit : {{ autoscaling_lower_limit }}</li>
+                <li class="list-group-item list-group-item-light">Maximum number of instances :{{ autoscaling_autoscaling_vm }}</li>
+                <li class="list-group-item list-group-item-light">Threshold of Scale-up : {{ autoscaling_upper_limit }}</li>
+                <li class="list-group-item list-group-item-light">Threshold of Scale-down : {{ autoscaling_lower_limit }}</li>
               </ul>
             </p>
           </div>
         </div>
         
-        <div class="col-md-8">
+        <div class="col-md-20">
           <div class="content-section">
             <h3>Tenant Settings</h3>
             <p>
@@ -33,7 +33,7 @@
           </div>
         </div>
         
-        <div class="col-md-8">
+        <div class="col-md-20">
           <div class="content-section">
             <h3>VM list</h3>
             <p>

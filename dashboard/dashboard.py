@@ -144,8 +144,8 @@ def settings():
     
     tenant_lb_rule_uuid = conf.get_lb_rule_uuid()
     tenant_zone_uuid = conf.get_zone_uuid()
-    tenant_template_uuid = conf.get_lb_rule_uuid()
-    tenant_serviceoffering_uuid = conf.get_template_uuid()
+    tenant_template_uuid = conf.get_template_uuid()
+    tenant_serviceoffering_uuid = conf.get_serviceoffering_uuid()
     autoscaling_autoscaling_vm = conf.get_autoscaling_vm()
     autoscaling_upper_limit = conf.get_upper_limit()
     autoscaling_lower_limit = conf.get_lower_limit()
@@ -180,11 +180,11 @@ def settings():
 def editsettings():    
     form = EditSettingsForm()
     cs = CloudStackApiClient.get_instance()
-    form.template_uuid.choices = cs.listTemplates()
-    form.lb_rule_uuid.choices = cs.listLoadBalancerRules()
-    form.serviceoffering_uuid.choices = cs.listServiceOfferings()
-    form.zone_uuid.choices = cs.listZones()
-    form.vms.choices = cs.listVirtualMachines()
+    form.template_uuid.choices = cs.listTemplates(force=True)
+    form.lb_rule_uuid.choices = cs.listLoadBalancerRules(force=True)
+    form.serviceoffering_uuid.choices = cs.listServiceOfferings(force=True)
+    form.zone_uuid.choices = cs.listZones(force=True)
+    form.vms.choices = cs.listVirtualMachines(force=True)
     conf = CloudStackConfig()
     
     if form.validate_on_submit():
