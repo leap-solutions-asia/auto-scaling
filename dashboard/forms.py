@@ -38,8 +38,15 @@ class EditSettingsForm(FlaskForm):
         InputRequired(), 
         NumberRange(min=1, max=99, message='A number must be between (1-99)')
     ])
-    vms =   AutoScalingSelectMultipleField('vms', choices=[])
+    vms =   AutoScalingSelectMultipleField('VM List', choices=[])
     submit = SubmitField('Update')
+    
+    def validate_vms(self, extra):
+        if len(self.vms.data) < 1:
+            msg = 'Please select a single VM at least!'
+            self.vms.errors.append(msg)
+            return False
+        return True
     
     def validate_lower_limit(self, extra):
         if type(self.lower_limit.data) is not int or type(self.upper_limit.data) is not int:
