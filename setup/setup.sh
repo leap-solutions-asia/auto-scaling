@@ -41,7 +41,7 @@ done
 if [ "${confirm}" -eq "0" ]; then
     while [ 1 ]
     do
-        echo -n "Install Auto Scaling Agent? [y/n]: "
+        echo -n "Install Auto Scaling Controller and Dashboard? [y/n]: "
         read line
         [ "${line}" = "y" -o "${line}" = "Y" ] && break
         [ "${line}" = "n" -o "${line}" = "N" ] && exit 1
