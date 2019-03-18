@@ -8,6 +8,7 @@ Just testing!
 
 Supported OS (Leap GIO Public Virtual Machine)
 * CentOS 7.x
+* Ubuntu 16.04
 
 Dashboard ports
 * 8080-8084/tcp (allow 8080-8084/tcp iptables or firewalld)
