@@ -1,0 +1,10 @@
+---
+
+- name: set dashboard ports to ufw
+  ufw:
+    rule: allow
+    port: "{{ dashboard_port + item|int }}"
+    proto: tcp
+  with_sequence: >
+    start=0
+    count={{ spare_count + 1 }}

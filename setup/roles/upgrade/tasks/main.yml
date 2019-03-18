@@ -1,4 +1,15 @@
 ---
 
-- name: upgrade all packages
-  yum: name=* state=latest
+- name: upgrade all packages for Redhat family
+  yum:
+    name: '*'
+    state: latest
+  when: ansible_os_family == 'RedHat'
+
+- name: upgrade all packages for Debian family
+  apt:
+    name: '*'
+    state: latest
+    force_apt_get: True
+    update_cache: yes
+  when: ansible_os_family == 'Debian'
