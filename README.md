@@ -11,7 +11,7 @@ Supported OS (Leap GIO Public Virtual Machine)
 * Ubuntu 16.04
 
 Dashboard ports
-* 8080-8084/tcp (allow 8080-8084/tcp iptables or firewalld)
+* 8080-8084/tcp (allow 8080-8084/tcp iptables, firewalld or ufw)
 
 ### Requirements
 
@@ -24,7 +24,7 @@ Required for Installation
 
 ### Getting Started
 
-1. Create a new CentOS 7.x VM on Leap GIO Public
+1. Create a new CentOS 7.x or Ubuntu 16.04 VM on Leap GIO Public
 1. Login to the VM
 1. Install and setup Auto Scaling Controller and Dashboard (Perform the following command)
 ```
@@ -74,7 +74,7 @@ bash <(curl -Ls https://github.com/leap-solutions-asia/auto-scaling/raw/master/s
 ### Getting Started
 
 1. Clone repository
-1. Start Auto Scaling Container
+1. Start Auto Scaling Container and Dashboard
 ```
 $ cd auto-scaling
 $ docker-compose up -d
