@@ -1,56 +1,9 @@
 ---
 
-- name: install required package for docker
-  yum:
-    name:
-      - yum-utils
-      - device-mapper-persistent-data
-      - lvm2 
-    state: latest
+- name: include tasks Redhat.yml
+  include_tasks: Redhat.yml
+  when: ansible_os_family == 'RedHat' and ansible_distribution_major_version|int > 6
 
-- name: check /etc/yum.repos.d/docker-ce.repo
-  stat:
-    path: /etc/yum.repos.d/docker-ce.repo
-  register: check_docker_ce_repo
-
-- name: setup docker-ce.repo
-  shell: yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
-  when: not check_docker_ce_repo.stat.exists
-
-- name: yum makecache fast
-  shell: yum makecache fast
-  args:
-    warn: False
-  when: not check_docker_ce_repo.stat.exists
-
-- name: install docker-ce
-  yum: name=docker-ce state=latest
-  register: install_docker
-  notify: restart docker
-
-- name: check /etc/docker/daemon.json
-  stat:
-    path: /etc/docker/daemon.json
-  register: check_docker_daemon
-
-- name: start docker (first time)
-  systemd:
-    name: docker.service
-    state: restarted
-    enabled: yes
-  when: install_docker.changed and not check_docker_daemon.stat.exists
-
-- name: get name servers
-  shell: cat /etc/resolv.conf | awk '/^nameserver/{ print $2 }'
-  register: dns
-  when: not check_docker_daemon.stat.exists
-
-- name: copy /etc/docker/daemon.json
-  template: >
-    src=daemon.json.j2
-    dest=/etc/docker/daemon.json
-    owner=root
-    group=root
-    mode=0644
-  notify: restart docker
-  when: not check_docker_daemon.stat.exists
+- name: include tasks Ubuntu.yml
+  include_tasks: Ubuntu.yml
+  when: ansible_distribution == 'Ubuntu' and ansible_distribution_major_version|int > 14

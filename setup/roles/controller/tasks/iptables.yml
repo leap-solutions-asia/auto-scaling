@@ -15,7 +15,7 @@
     chain: INPUT
     action: insert
     protocol: tcp
-    destination_port: {{ dashboard_port + item|int }}
+    destination_port: "{{ dashboard_port + item|int }}"
     jump: ACCEPT
   with_sequence: >
     start=0

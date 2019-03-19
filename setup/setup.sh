@@ -49,9 +49,29 @@ if [ "${confirm}" -eq "0" ]; then
 fi
 
 #
-if [ "${install}" -eq "0" ]; then
-    yum -y install git ansible
+if [ -f "/etc/os-release" ]; then
+    . /etc/os-release
 fi
+
+case "${ID}${VERSION_ID}" in
+    centos7)
+        if [ "${install}" -eq "0" ]; then
+            yum -y install git ansible
+        fi
+        ;;
+    ubuntu16.04)
+        if [ "${install}" -eq "0" ]; then
+            apt-get update
+            apt-get install -y software-properties-common
+            apt-add-repository --yes --update ppa:ansible/ansible
+            apt-get install -y git ansible
+        fi
+        ;;
+    *)
+        echo "Error: unsupported OS"
+        exit 1
+        ;;
+esac
 
 #
 if [ -d "${SRC_PATH}" ]; then
