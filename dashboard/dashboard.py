@@ -31,31 +31,36 @@ def dashboard():
         return redirect(url_for('editsettings'))
        
     params = {}
+    params["title"] = 'Autoscale Dashboard'
+    params["labels"] = None
+    params["datasets"] = None
+    params["autoscaling_data"] = None
+    
     if not os.path.exists(autoscaling_file):
         params["message"] = 'Autoscaling file does not exist, Please try to reload in minutes'
     
-    with open(autoscaling_file, 'rb') as fd:
-        autoscaling_data = pickle.load(fd)
+    else:
+        with open(autoscaling_file, 'rb') as fd:
+            autoscaling_data = pickle.load(fd)
     
-    labels = [] 
-    for uuid, value in autoscaling_data['status'].items():
-        labels = [ x[0] for x in value ]
-        break
+        labels = [] 
+        for uuid, value in autoscaling_data['status'].items():
+            labels = [ x[0] for x in value ]
+            break
     
-    datasets = []
-    for uuid, value in autoscaling_data['status'].items():
-        color = re.sub('^[^-]*([^-])-[^-]*([^-])-[^-]*([^-])-[^-]*([^-])-[^-]*([^-]{2})$', '#\\1\\2\\3\\4\\5', uuid)
-        datasets.append({
-            "label": autoscaling_data['vm'][uuid]['name'],
-            "borderColor": color,
-            "fill": False,
-            "data": [ x[1] for x in value ]
-        })
+        datasets = []
+        for uuid, value in autoscaling_data['status'].items():
+            color = re.sub('^[^-]*([^-])-[^-]*([^-])-[^-]*([^-])-[^-]*([^-])-[^-]*([^-]{2})$', '#\\1\\2\\3\\4\\5', uuid)
+            datasets.append({
+                "label": autoscaling_data['vm'][uuid]['name'],
+                "borderColor": color,
+                "fill": False,
+                "data": [ x[1] for x in value ]
+            })
 
-    params["title"] = 'Autoscale Dashboard'
-    params["labels"] = labels
-    params["datasets"] = datasets
-    params["autoscaling_data"] = autoscaling_data
+        params["labels"] = labels
+        params["datasets"] = datasets
+        params["autoscaling_data"] = autoscaling_data
     
     return render_template('dashboard.html', **params)
 
