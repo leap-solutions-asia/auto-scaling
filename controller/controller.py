@@ -14,6 +14,8 @@ from pathlib import Path
 from tempfile import NamedTemporaryFile
 from cs import read_config, CloudStack
 
+import catalog
+
 #
 CONFIG_FILE = "/auto-scaling/cloudstack.ini"
 STATUS_FILE = "/auto-scaling/autoscaling.status"
@@ -382,6 +384,7 @@ class AutoScalingStatus(AutoScalingData):
     def __init__(self, file, debug=False):
         super().__init__(file, debug)
         self._agents = {}
+        self._event_save = None
 
     def __del__(self):
         for agent in self._agents.values():
@@ -434,7 +437,8 @@ class AutoScalingStatus(AutoScalingData):
         self.data = {
             'vm'     : {},
             'status' : {},
-            'average': 0.0
+            'average': 0.0,
+            'info'   : { 'code': 200, 'message': None },
         }
         if Path(self._file).is_file():
             with open(self._file, 'rb') as fd:
@@ -454,6 +458,32 @@ class AutoScalingStatus(AutoScalingData):
         if tmpfile:
             os.rename(tmpfile, self._file)
             self.dump()
+
+    @property
+    def is_constant_save(self):
+        return self._event_save is not None
+
+    def start_constant_save(self):
+        def run():
+            while not self._event_save.wait(timeout=15):
+                self.save()
+            self._event_save = None
+
+        if not self.is_constant_save:
+            thread = threading.Thread(target=run)
+            self._event_save = threading.Event()
+            thread.start()
+
+    def stop_constant_save(self):
+        if self.is_constant_save:
+            self._event_save.set()
+
+    def set_info(self, code, **kwargs):
+        c = catalog.CATALOG[code]
+        self.data['info'] = {
+            'code': code,
+            'message': c.format(**kwargs) if c else c
+        }
 
 #
 class AutoScalingController:
@@ -496,6 +526,10 @@ class AutoScalingController:
         updated = self._config.load()
         self._print_debug("ready={}, updated={}".format(self._config.ready, updated))
         if not self._config.ready:
+            if self._status.is_constant_save:
+                self._status.stop_constant_save()
+                self._status.set_info(catalog.ERROR_CONFIG)
+                self.save_status()
             return False
         if updated:
             self._get_cloudstack()
@@ -511,6 +545,8 @@ class AutoScalingController:
             for vm in self._stable_vm():
                 if vm['uuid'] not in stables:
                     self._status.remove_vm(vm['uuid'])
+        self._status.set_info(catalog.OK)
+        self._status.start_constant_save()
         return True
 
     def load_status(self):
@@ -527,6 +563,7 @@ class AutoScalingController:
             name = "{}{:02d}".format(self._prefix, i)
             if name not in vms:
                 break
+        self._status.set_info(catalog.OK_CREATING, name=name)
         vm = self._client.create_vm(
             name,
             self._config.data['tenant']['lb_rule_uuid'],
@@ -534,11 +571,13 @@ class AutoScalingController:
             self._config.data['tenant']['serviceoffering_uuid']
         )
         if vm is None:
+            self._status.set_info(catalog.ERROR_CREATE, name=name)
             print_info("Error: Failed to create a new vm: name={}".format(name))
             return
         uuid = vm['uuid']
         if self._status.add_vm(**vm, autoscaling=True, wait=True):
             self._status.init_status()
+            self._status.set_info(catalog.OK_CREATED, name=name)
             print_info("Create new vm: name={}, uuid={}".format(name, uuid))
         else:
             self._client.remove_vm(uuid, self._config.data['tenant']['lb_rule_uuid'])
@@ -558,9 +597,11 @@ class AutoScalingController:
                 uuid = vms[-1]['uuid']
         else:
             name = self._status.data['vm'][uuid]['name']
+        self._status.set_info(catalog.OK_REMOVING, name=name)
         self._client.remove_vm(uuid, self._config.data['tenant']['lb_rule_uuid'])
         self._status.remove_vm(uuid)
         self._status.init_status()
+        self._status.set_info(catalog.OK_REMOVED, name=name)
         print_info("remove the vm: name={}, uuid={}".format(name, uuid))
 
     def clean_vm(self):
@@ -588,10 +629,12 @@ class AutoScalingController:
             total_usage += sum([ x[1] for x in target ])
 
         if total_count == 0:
+            self._status.set_info(catalog.OK_NO_DATA)
             self._print_debug("There's not any usage")
             return
 
         average = round(total_usage / total_count, 1)
+        self._status.set_info(catalog.OK_AVERAGE, average=average)
         if total_count == ( USAGE_COUNT * len(vms) ):
             if average >= self._config.data['autoscaling']['upper_limit']:
                 self.create_vm()
@@ -606,7 +649,6 @@ class AutoScalingController:
             if self.load_config():
                 self.clean_vm()
                 self.calculate_usage()
-                self.save_status()
             interval = INTERVAL - ( time.time() - begin_time )
             if interval > 0:
                 time.sleep(interval)

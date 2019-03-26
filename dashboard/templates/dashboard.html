@@ -9,6 +9,19 @@
     <h1>{{ message }}</h1>
 {% endif %}
 
+{% if autoscaling_data and autoscaling_data['info']['message'] %}
+<div class="col-md-20">
+  <ul class="list-group">
+    {% if autoscaling_data['info']['code']|int < 300 %}
+    <li class="list-group-item list-group-item-light">{{autoscaling_data['info']['message']}}</li>
+    {% else %}
+    <li class="list-group-item list-group-item-light" style="background-color: #ffdddd;">{{autoscaling_data['info']['message']}}</li>
+    {% endif %}
+  </ul>
+</div>
+<p></p>
+{% endif %}
+
 {% if labels and datasets %}
 <!-- bar chart canvas element --><canvas id="ChartDemo"></canvas>
 <script>
@@ -35,7 +48,7 @@ var myChart = new Chart(ctx, {
 
 <p></p>
 
-{% if autoscaling_data %}
+{% if autoscaling_data and autoscaling_data['vm']|length > 0 %}
 <table id="customers">
 <thead><tr><th>Name</th><th>Type</th><th>Active</th><th>No. of Failure</th></tr></thead>
 {% for uuid, value in autoscaling_data['vm'].items() %}
