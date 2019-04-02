@@ -25,7 +25,7 @@ services:
     networks:
       - default
     ports:
-      - {{ dashboard_port }}:{{ dashboard_port + item|int }}
+      - {{ dashboard_port + item|int }}:{{ dashboard_port }}
     restart: always
     volumes:
       - data:/auto-scaling
