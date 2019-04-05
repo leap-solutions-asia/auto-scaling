@@ -73,6 +73,7 @@ class CloudStackApiClient:
         self._lbs = {}
         self._templates = {}
         self._offerings = {}
+        self._networks = {}
 
     def _print_debug(self, text):
         if self._debug:
@@ -107,6 +108,9 @@ class CloudStackApiClient:
     def listLoadBalancerRules(self):
         return self._list("listLoadBalancerRules", { "zoneid": self.zoneid })
 
+    def listNetworks(self):
+        return self._list("listNetworks", { "zoneid": self.zoneid })
+
     def listTemplates(self):
         return self._list("listTemplates", { "zoneid": self.zoneid, "templatefilter": "self" })
 
@@ -116,11 +120,12 @@ class CloudStackApiClient:
     def listVirtualMachines(self):
         return self._list("listVirtualMachines", { "zoneid": self.zoneid })
 
-    def deployVirtualMachine(self, name, templateid, offeringid):
+    def deployVirtualMachine(self, name, templateid, offeringid, networkids):
         result = self._cs.deployVirtualMachine(
             zoneid=self.zoneid,
             serviceofferingid=offeringid,
             templateid=templateid,
+            networkids=",".join(networkids),
             name=name,
             displayname=name
         )
@@ -173,6 +178,13 @@ class CloudStackApiClient:
             force=force
         )
 
+    def get_network_data(self, uuid, force=False):
+        return self._get_data(
+            uuid=uuid, cache=self._networks, method="listNetworks",
+            params=(('name', 'name'), ('uuid', 'id')),
+            force=force
+        )
+
     def get_template_data(self, uuid, force=False):
         return self._get_data(
             uuid=uuid, cache=self._templates, method="listTemplates",
@@ -187,8 +199,8 @@ class CloudStackApiClient:
             force=force
         )
 
-    def create_vm(self, name, lbid, templateid, offeringid):
-        vm = self.deployVirtualMachine(name, templateid, offeringid)
+    def create_vm(self, name, lbid, templateid, offeringid, networkids):
+        vm = self.deployVirtualMachine(name, templateid, offeringid, networkids)
         if vm:
             self.assignToLoadBalancerRule(lbid, vm['uuid'])
         return vm
@@ -273,12 +285,13 @@ class AutoScalingConfig(AutoScalingData):
             'key'                 : (str,   True, None),
             'secret'              : (str,   True, None),
         },
-        'tenant'     : {
-            'zone_uuid'           : (str,   True, '_judge_zone'),
-            'lb_rule_uuid'        : (str,   True, '_judge_lb'),
-            'template_uuid'       : (str,   True, '_judge_template'),
-            'serviceoffering_uuid': (str,   True, '_judge_offering'),
-        },
+        'tenant'     : dict(**{
+            'zone_uuid'           : (str,   True,  '_judge_zone'),
+            'lb_rule_uuid'        : (str,   True,  '_judge_lb'),
+            'template_uuid'       : (str,   True,  '_judge_template'),
+            'serviceoffering_uuid': (str,   True,  '_judge_offering'),
+            'network1_uuid'       : (str,   True,  '_judge_network'),
+        }, **{ f'network{i}_uuid' : (str,   False, '_judge_network') for i in range(2, 10) }),
         'vm'         : {
             'vm1_uuid'            : (str,   True, None),
         },
@@ -300,6 +313,9 @@ class AutoScalingConfig(AutoScalingData):
 
     def _judge_lb(self, uuid):
         return self._client.get_lb_data(uuid) is not None
+
+    def _judge_network(self, uuid):
+        return self._client.get_network_data(uuid) is not None
 
     def _judge_template(self, uuid):
         return self._client.get_template_data(uuid) is not None
@@ -329,6 +345,8 @@ class AutoScalingConfig(AutoScalingData):
         for section, params in self._SCHEMA.items():
             for name, options in params.items():
                 if options[2]:
+                    if name not in self.data[section]:
+                        continue
                     if not getattr(self, options[2])(self.data[section][name]):
                         self._print_debug("Option {} => {} is incorrect".format(section, name))
                         return False
@@ -374,6 +392,15 @@ class AutoScalingConfig(AutoScalingData):
     @property
     def ready(self):
         return self._ready
+
+    @property
+    def tenant_networks(self):
+        networks = []
+        for i in range(1, 10):
+            name = f'network{i}_uuid'
+            if name in self.data['tenant']:
+                networks.append(self.data['tenant'][name])
+        return networks
 
 #
 class AutoScalingStatus(AutoScalingData):
@@ -568,7 +595,8 @@ class AutoScalingController:
             name,
             self._config.data['tenant']['lb_rule_uuid'],
             self._config.data['tenant']['template_uuid'],
-            self._config.data['tenant']['serviceoffering_uuid']
+            self._config.data['tenant']['serviceoffering_uuid'],
+            self._config.tenant_networks
         )
         if vm is None:
             self._status.set_info(catalog.ERROR_CREATE, name=name)

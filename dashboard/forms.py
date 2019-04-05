@@ -23,6 +23,7 @@ class AutoScalingSelectMultipleField(SelectMultipleField):
 
 class EditSettingsForm(FlaskForm):
     template_uuid = AutoScalingSelectField('Template')
+    nws = AutoScalingSelectMultipleField('Network List', choices=[])
     lb_rule_uuid = AutoScalingSelectField('Loadbalancer Rule')
     serviceoffering_uuid = AutoScalingSelectField('Service Offering')
     zone_uuid = AutoScalingSelectField('Zone')
@@ -45,6 +46,13 @@ class EditSettingsForm(FlaskForm):
         if len(self.vms.data) < 1:
             msg = 'Please select a single VM at least!'
             self.vms.errors.append(msg)
+            return False
+        return True
+    
+    def validate_nws(self, extra):
+        if len(self.nws.data) < 1:
+            msg = 'Please select a single network at least!'
+            self.nws.errors.append(msg)
             return False
         return True
     
