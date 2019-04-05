@@ -90,7 +90,21 @@
                             {% endfor %}
                         </div>
                     {% else %}
-                        {{ form.template_uuid(class="form-control form-control-lg", default=tenant_template_uuid) }}
+                        {{ form.template_uuid(class="form-control form-control-lg", value=tenant_template_uuid) }}
+                    {% endif %}
+                </div>
+                
+                <div class="form-group">
+                    {{ form.nws.label(class="form-control-label") }}
+                    {% if form.nws.errors %}
+                        {{ form.nws(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.nws.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.nws(class="form-control form-control-lg", value=nws)  }}
                     {% endif %}
                 </div>
 				

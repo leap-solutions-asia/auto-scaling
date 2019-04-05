@@ -159,7 +159,13 @@ def settings():
     tenant_lb_rule_name = cs.get_lb_name(tenant_lb_rule_uuid)
     tenant_template_name = cs.get_tp_name(tenant_template_uuid)
     tenant_serviceoffering_name = cs.get_sv_name(tenant_serviceoffering_uuid)
-            
+    
+    networks_name_list = []
+    if conf.has_tenant_section():
+        for nw_uuid in conf.get_networks():
+            nw_name = cs.get_nw_name(nw_uuid)
+            networks_name_list.append(nw_name)
+    
     vms_name_list = []
     if conf.has_vm_section():
         for vm in conf.get_vm_list():
@@ -173,6 +179,7 @@ def settings():
     params["tenant_zone_name"] = tenant_zone_name
     params["tenant_lb_rule_name"] = tenant_lb_rule_name
     params["tenant_template_name"] = tenant_template_name
+    params["networks_name_list"] = networks_name_list
     params["tenant_serviceoffering_name"] = tenant_serviceoffering_name
     params["autoscaling_autoscaling_vm"] = autoscaling_autoscaling_vm
     params["autoscaling_upper_limit"] = autoscaling_upper_limit
@@ -186,6 +193,7 @@ def editsettings():
     form = EditSettingsForm()
     cs = CloudStackApiClient.get_instance()
     form.template_uuid.choices = cs.listTemplates(force=True)
+    form.nws.choices = cs.listNetworks(force=True)
     form.lb_rule_uuid.choices = cs.listLoadBalancerRules(force=True)
     form.serviceoffering_uuid.choices = cs.listServiceOfferings(force=True)
     form.zone_uuid.choices = cs.listZones(force=True)
@@ -193,15 +201,19 @@ def editsettings():
     conf = CloudStackConfig()
     
     if form.validate_on_submit():
-        if not conf.has_tenant_section():
-            conf.add_tenant_section()
+        if conf.has_tenant_section():
+            conf.remove_tenant_section()
+        conf.add_tenant_section()
         conf.set_zone_uuid(form.zone_uuid.data)
         conf.set_lb_rule_uuid(form.lb_rule_uuid.data)
         conf.set_template_uuid(form.template_uuid.data)
         conf.set_serviceoffering_uuid(form.serviceoffering_uuid.data)
+        for num, uuid in enumerate(form.nws.data, start=1):
+            conf.set_nw("network{}_uuid".format(num), uuid)
             
-        if not conf.has_autoscaling_section():
-            conf.add_autoscaling_section()
+        if conf.has_autoscaling_section():
+            conf.remove_autoscaling_section()
+        conf.add_autoscaling_section()
         conf.set_autoscaling_vm(form.autoscaling_vm.data)
         conf.set_upper_limit(form.upper_limit.data)
         conf.set_lower_limit(form.lower_limit.data)
@@ -223,6 +235,7 @@ def editsettings():
         tenant_lb_rule_uuid = conf.get_lb_rule_uuid()
         tenant_template_uuid = conf.get_template_uuid()
         tenant_serviceoffering_uuid = conf.get_serviceoffering_uuid()
+        nws = conf.get_networks()
         autoscaling_autoscaling_vm = conf.get_autoscaling_vm()
         autoscaling_upper_limit = conf.get_upper_limit()
         autoscaling_lower_limit = conf.get_lower_limit()
@@ -233,6 +246,7 @@ def editsettings():
 
         form.zone_uuid.default = tenant_zone_uuid
         form.template_uuid.default = tenant_template_uuid
+        form.nws.default = nws
         form.serviceoffering_uuid.default = tenant_serviceoffering_uuid
         form.lb_rule_uuid.default = tenant_lb_rule_uuid
         form.vms.default = vms
@@ -242,6 +256,7 @@ def editsettings():
             "tenant_zone_uuid": tenant_zone_uuid, 
             "tenant_lb_rule_uuid": tenant_lb_rule_uuid,
             "tenant_template_uuid": tenant_template_uuid,
+            "nws": nws,
             "tenant_serviceoffering_uuid": tenant_serviceoffering_uuid,
             "autoscaling_autoscaling_vm": autoscaling_autoscaling_vm,
             "autoscaling_upper_limit": autoscaling_upper_limit,

@@ -59,6 +59,12 @@ class CloudStackConfig:
             data = self._conf.get("tenant", "template_uuid")
         return data
         
+    def get_nw_uuid(self, nw):
+        data = None
+        if self.has_tenant_section():
+            data = self._conf.get("tenant", nw)
+        return data
+        
     def get_serviceoffering_uuid(self):
         data = None
         if self.has_tenant_section():
@@ -118,6 +124,11 @@ class CloudStackConfig:
         if not self.has_tenant_section():
             self.add_tenant_section()
         uuid = self._conf.set("tenant", "template_uuid", data)
+        
+    def set_nw(self, item, data):
+        if not self.has_tenant_section():
+            self.add_tenant_section()
+        uuid = self._conf.set("tenant", item, data)
         
     def set_serviceoffering_uuid(self, data):
         if not self.has_tenant_section():
@@ -192,4 +203,19 @@ class CloudStackConfig:
         data = None
         if self.has_vm_section():
             data = self._conf.options("vm")
+        return data
+    
+    def get_tenant_list(self):
+        data = None
+        if self.has_tenant_section():
+            data = self._conf.options("tenant")
+        return data
+        
+    def get_networks(self):
+        data = []
+        if self.has_tenant_section():
+            for nw in self.get_tenant_list():
+                if nw.startswith("network"):
+                    uuid = self.get_nw_uuid(nw)
+                    data.append((uuid))
         return data

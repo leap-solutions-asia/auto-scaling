@@ -35,6 +35,19 @@
         
         <div class="col-md-20">
           <div class="content-section">
+            <h3>Network list</h3>
+            <p>
+              <ul class="list-group">
+                {% for i in networks_name_list %}
+                    <li class="list-group-item list-group-item-light">{{ i }}</li>
+                {% endfor %}
+              </ul>
+            </p>
+          </div>
+        </div>
+        
+        <div class="col-md-20">
+          <div class="content-section">
             <h3>VM list</h3>
             <p>
               <ul class="list-group">

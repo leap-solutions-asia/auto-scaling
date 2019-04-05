@@ -20,6 +20,7 @@ class CloudStackApiClient:
         self.zones = []
         self.lbs = []
         self.tps = []
+        self.nws = []
         self.svs = []
     
     def listVirtualMachines(self, force=False):
@@ -45,6 +46,12 @@ class CloudStackApiClient:
             tps = self._cs.listTemplates(templatefilter="self")
             self.tps = [ (tp['id'], tp['name']) for tp in tps['template'] ]
         return self.tps
+        
+    def listNetworks(self, force=False):
+        if force or len(self.nws) == 0:
+            nws = self._cs.listNetworks()
+            self.nws = [ (nw['id'], nw['name']) for nw in nws['network'] ]
+        return self.nws
 		
     def listServiceOfferings(self, force=False):
         if force or len(self.svs) == 0:
@@ -84,6 +91,13 @@ class CloudStackApiClient:
         if name is None:
             self.listTemplates(force=True)
             name = self._get_name(self.tps, uuid)
+        return name
+        
+    def get_nw_name(self, uuid):
+        name = self._get_name(self.nws, uuid)
+        if name is None:
+            self.listNetworks(force=True)
+            name = self._get_name(self.nws, uuid)
         return name
         
     def get_sv_name(self, uuid):
