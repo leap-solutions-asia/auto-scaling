@@ -30,4 +30,6 @@ services:
     volumes:
       - data:/auto-scaling
       - .:/auto-scaling/tmp
-    command: python -u dashboard/dashboard.py
+    command: flask run --host 0.0.0.0 --port {{ dashboard_port }}
+    environment:
+      FLASK_APP: dashboard/dashboard.py

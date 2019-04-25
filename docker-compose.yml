@@ -29,4 +29,6 @@ services:
     restart: always
     volumes:
       - data:/auto-scaling
-    command: python -u dashboard/dashboard.py
+    command: flask run --host 0.0.0.0 --port 8080
+    environment:
+      FLASK_APP: dashboard/dashboard.py
