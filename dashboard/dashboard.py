@@ -192,9 +192,16 @@ def settings():
 def editsettings():    
     form = EditSettingsForm()
     cs = CloudStackApiClient.get_instance()
+    messages = []
     form.template_uuid.choices = cs.listTemplates(force=True)
+    if not form.template_uuid.choices:
+        form.template_uuid.errors = ['Please create templates first!']
+        messages.append({'category':'danger','content':'Please create templates first!'})
     form.nws.choices = cs.listNetworks(force=True)
     form.lb_rule_uuid.choices = cs.listLoadBalancerRules(force=True)
+    if not form.lb_rule_uuid.choices:
+        form.lb_rule_uuid.errors = ['Please create LB rules first!']
+        messages.append({'category':'danger','content':'Please create LB Rules first!'})
     form.serviceoffering_uuid.choices = cs.listServiceOfferings(force=True)
     form.zone_uuid.choices = cs.listZones(force=True)
     form.vms.choices = cs.listVirtualMachines(force=True)
@@ -261,11 +268,12 @@ def editsettings():
             "autoscaling_autoscaling_vm": autoscaling_autoscaling_vm,
             "autoscaling_upper_limit": autoscaling_upper_limit,
             "autoscaling_lower_limit": autoscaling_lower_limit,
-            "vms": vms
+            "vms": vms,
         }
 
     params["title"] = 'Edit Settings'
     params["form"] = form
+    params["messages"] = messages
     return render_template('editsettings.html', **params)
 
 if __name__ == '__main__':                        
