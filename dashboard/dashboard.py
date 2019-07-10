@@ -183,7 +183,7 @@ def settings():
             vms_name_list.append(vm_name)
 
     timezone = dict(TIMEZONE).get(DEFAULT_TIMEZONE)
-    if conf.get_timezone()is not None:
+    if conf.get_timezone() is not None:
         timezone = dict(TIMEZONE).get(conf.get_timezone())
 
     params = {}
