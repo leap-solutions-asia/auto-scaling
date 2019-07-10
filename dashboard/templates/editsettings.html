@@ -142,6 +142,20 @@
                     {% endif %}
                 </div>
 
+                <div class="form-group">
+                    {{ form.timezone.label(class="form-control-label") }}
+                    {% if form.timezone.errors %}
+                        {{ form.timezone(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.timezone.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.timezone(class="form-control form-control-lg", value=timezone)  }}
+                    {% endif %}
+                </div>
+
             </fieldset>
 
             <div class="form-group">

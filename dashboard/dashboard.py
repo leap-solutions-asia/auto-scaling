@@ -7,6 +7,9 @@ from forms import SettingsForm, CredentialForm, EditCredentialForm, EditSettings
 
 from CloudStackApiClient import CloudStackApiClient
 from CloudStackConfig import CloudStackConfig, cloudstack_file
+from timezone import TIMEZONE, DEFAULT_TIMEZONE
+
+from datetime import datetime, timedelta
 
 app = Flask(__name__)
 
@@ -47,6 +50,12 @@ def dashboard():
         for uuid, value in autoscaling_data['status'].items():
             labels = [ x[0] for x in value ]
             break
+
+        if conf.get_timezone() is not None:
+            offset = timedelta(seconds=int(conf.get_timezone()))
+            for i , utc_str in enumerate(labels):
+                utc_datetime = datetime.strptime(utc_str, '%H:%M:%S') + offset
+                labels[i] = utc_datetime.strftime('%H:%M:%S')
     
         datasets = []
         for uuid, value in autoscaling_data['status'].items():
@@ -172,7 +181,11 @@ def settings():
             vm_uuid = conf.get_vm_uuid(vm)
             vm_name = cs.get_vm_name(vm_uuid)
             vms_name_list.append(vm_name)
-    
+
+    timezone = dict(TIMEZONE).get(DEFAULT_TIMEZONE)
+    if conf.get_timezone() is not None:
+        timezone = dict(TIMEZONE).get(conf.get_timezone())
+
     params = {}
     params["title"] = 'Settings'
     params["form"] = form
@@ -185,6 +198,7 @@ def settings():
     params["autoscaling_upper_limit"] = autoscaling_upper_limit
     params["autoscaling_lower_limit"] = autoscaling_lower_limit
     params["vms_name_list"] = vms_name_list
+    params["timezone"] = timezone
 
     return render_template('settings.html', **params)
 
@@ -230,6 +244,11 @@ def editsettings():
         conf.add_vm_section()
         for num, uuid in enumerate(form.vms.data, start=1):
             conf.set_vm("vm{}_uuid".format(num), uuid)
+
+        if conf.has_dashboard_section():
+            conf.remove_dashboard_section()
+        conf.add_dashboard_section()
+        conf.set_timezone(form.timezone.data)
     
         conf.update_configfile()
             
@@ -257,6 +276,8 @@ def editsettings():
         form.serviceoffering_uuid.default = tenant_serviceoffering_uuid
         form.lb_rule_uuid.default = tenant_lb_rule_uuid
         form.vms.default = vms
+        if conf.get_timezone() is not None:
+            form.timezone.default = conf.get_timezone()
         form.process()
       
         params = {

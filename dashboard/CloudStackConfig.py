@@ -94,6 +94,12 @@ class CloudStackConfig:
         if self.has_vm_section():
             data = self._conf.get("vm", vm)
         return data
+
+    def get_timezone(self):
+        data = None
+        if self.has_dashboard_section():
+            data = self._conf.get("dashboard", "timezone")
+        return data
     
     def set_secret(self, data):
         if not self.has_cloudstack_section():
@@ -139,6 +145,11 @@ class CloudStackConfig:
         if not self.has_autoscaling_section():
             self.add_autoscaling_section()
         uuid = self._conf.set("autoscaling", "autoscaling_vm", str(data))
+
+    def set_timezone(self, data):
+        if not self.has_dashboard_section():
+            self.add_dashboard_section()
+        timezone = self._conf.set("dashboard", "timezone", str(data))
     
     def set_upper_limit(self, data):
         if not self.has_autoscaling_section():
@@ -169,6 +180,11 @@ class CloudStackConfig:
         if self._conf.has_section("autoscaling"):
             return True
         return False
+    
+    def has_dashboard_section(self):
+        if self._conf.has_section("dashboard"):
+            return True
+        return False
         
     def has_cloudstack_section(self):
         if self._conf.has_section("cloudstack"):
@@ -195,6 +211,9 @@ class CloudStackConfig:
         
     def remove_autoscaling_section(self):
         self._conf.remove_section("autoscaling")
+
+    def add_dashboard_section(self):
+        self._conf.add_section("dashboard")
         
     def remove_vm_section(self):
         self._conf.remove_section("vm")

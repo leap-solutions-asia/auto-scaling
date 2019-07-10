@@ -6,8 +6,8 @@ from wtforms import StringField, PasswordField, SubmitField, BooleanField, Selec
 from wtforms.validators import DataRequired, Length, Email, EqualTo, NumberRange, URL, InputRequired, ValidationError
 
 from cs import read_config, CloudStack
-
 from CloudStackApiClient import CloudStackApiClient
+from timezone import TIMEZONE, DEFAULT_TIMEZONE
 
 class AutoScalingSelectField(SelectField):
     def iter_choices(self):
@@ -40,6 +40,7 @@ class EditSettingsForm(FlaskForm):
         NumberRange(min=1, max=99, message='A number must be between (1-99)')
     ])
     vms =   AutoScalingSelectMultipleField('VM List', choices=[])
+    timezone = AutoScalingSelectField('Timezone', default=DEFAULT_TIMEZONE, choices=TIMEZONE)
     submit = SubmitField('Update')
     
     def validate_vms(self, extra):
