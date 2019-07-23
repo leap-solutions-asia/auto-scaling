@@ -38,13 +38,17 @@ class CloudStackApiClient:
     def listLoadBalancerRules(self, force=False):
         if force or len(self.lbs) == 0:
             lbs = self._cs.listLoadBalancerRules()
-            self.lbs = [ (lb['id'], lb['name']) for lb in lbs['loadbalancerrule'] ]
+            self.lbs = []
+            if 'loadbalancerrule' in lbs:
+                self.lbs = [ (lb['id'], lb['name']) for lb in lbs['loadbalancerrule'] ]
         return self.lbs
 
     def listTemplates(self, force=False):
         if force or len(self.tps) == 0:
             tps = self._cs.listTemplates(templatefilter="self")
-            self.tps = [ (tp['id'], tp['name']) for tp in tps['template'] ]
+            self.tps = []
+            if 'template' in tps:
+                self.tps = [ (tp['id'], tp['name']) for tp in tps['template'] ]
         return self.tps
         
     def listNetworks(self, force=False):
