@@ -211,6 +211,9 @@ class CloudStackConfig:
         
     def remove_autoscaling_section(self):
         self._conf.remove_section("autoscaling")
+    
+    def remove_dashboard_section(self):
+        self._conf.remove_section("dashboard")
 
     def add_dashboard_section(self):
         self._conf.add_section("dashboard")
