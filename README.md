@@ -1,7 +1,5 @@
 # Auto Scaling for Leap GIO Public
 
-Just testing!
-
 ## Auto Scaling Controller and Dashboard
 
 ### Specifications
@@ -9,6 +7,7 @@ Just testing!
 Supported OS (Leap GIO Public Virtual Machine)
 * CentOS 7.x
 * Ubuntu 16.04
+* Ubuntu 18.04
 
 Dashboard ports
 * 8080-8084/tcp (allow 8080-8084/tcp iptables, firewalld or ufw)
@@ -41,6 +40,7 @@ Supported OS (Leap GIO Public Virtual Machine)
 * CentOS 7.x
 * Ubuntu 14.04
 * Ubuntu 16.04
+* Ubuntu 18.04
 
 Agent port
 * 8585/tcp (allow 8585/tcp iptables, firewalld or ufw)
