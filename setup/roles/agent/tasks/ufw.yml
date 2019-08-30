@@ -3,5 +3,5 @@
 - name: set 8585/tcp to ufw
   ufw:
     rule: allow
-    port: 8585
+    port: "8585"
     proto: tcp
