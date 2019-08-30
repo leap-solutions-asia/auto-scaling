@@ -59,7 +59,7 @@ case "${ID}${VERSION_ID}" in
             yum -y install git ansible
         fi
         ;;
-    ubuntu16.04)
+    ubuntu16.04|ubuntu18.04)
         if [ "${install}" -eq "0" ]; then
             apt-get update
             apt-get install -y software-properties-common
