@@ -23,7 +23,7 @@ Required for Installation
 
 ### Getting Started
 
-1. Create a new CentOS 7.x or Ubuntu 16.04 VM on Leap GIO Public
+1. Create a new VM of Supported OS on Leap GIO Public
 1. Login to the VM
 1. Install and setup Auto Scaling Controller and Dashboard (Perform the following command)
 ```
