@@ -56,8 +56,16 @@
     path: /etc/docker/daemon.json
   register: check_docker_daemon
 
+- name: systemctl status systemd-resolved
+  shell: systemctl status systemd-resolved
+  args:
+    warn: False
+  register: systemd_resolved_status
+  changed_when: False
+  failed_when: systemd_resolved_status.rc not in [ 0, 3, 4 ]
+
 - name: get name servers
-  shell: cat /etc/resolv.conf | awk '/^nameserver/{ print $2 }'
+  shell: cat {{ '/run/systemd/resolve/resolv.conf' if systemd_resolved_status.rc == 0 else '/etc/resolv.conf' }} | awk '/^nameserver/{ print $2 }'
   register: dns
   when: not check_docker_daemon.stat.exists
 
